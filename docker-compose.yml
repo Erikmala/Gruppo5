@@ -1,0 +1,46 @@
+services:
+  app:
+    build: .
+    container_name: tech_hub_app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www          # monta tutta la root del progetto dentro al container
+    depends_on:
+      - db
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-tech_hub_db}
+      DB_USER: ${DB_USER:-tech_hub_user}
+      DB_PASS: ${DB_PASS:-admin123}
+      DB_CHARSET: ${DB_CHARSET:-utf8mb4}
+
+  db:
+    image: mysql:8.0
+    container_name: tech_hub_db
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: tech_hub_db
+      MYSQL_USER: tech_hub_user
+      MYSQL_PASSWORD: admin123
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d:ro   # esegue database.sql e simulazione.sql al primo avvio
+      - dbdata:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: tech_hub_pma
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: tech_hub_user
+      PMA_PASSWORD: admin123
+    depends_on:
+      - db
+
+volumes:
+  dbdata:

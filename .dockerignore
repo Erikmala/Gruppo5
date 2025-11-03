@@ -1,0 +1,11 @@
+# Cartella creata automaticamente da Apache (non usata, usiamo /public)
+html/
+
+# File temporanei
+-w
+*.tmp
+*.log
+
+# File di sistema
+.DS_Store
+Thumbs.db
