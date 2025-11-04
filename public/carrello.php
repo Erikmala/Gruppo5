@@ -87,21 +87,21 @@ $showAdded = isset($_GET['added']);
             <?php foreach ($cartItems as $item): ?>
               <tr>
                 <td>
-                  <img src="<?= htmlspecialchars(ottieni_url_immagine_prodotto($item['codice_sku'] ?? $item['sku'])) ?>" 
-                       alt="<?= htmlspecialchars($item['nome_prodotto'] ?? $item['product_name']) ?>" 
+                  <img src="<?= htmlspecialchars(ottieni_url_immagine_prodotto($item['codice_sku'])) ?>" 
+                       alt="<?= htmlspecialchars($item['nome_prodotto']) ?>" 
                        style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
                 </td>
-                <td><strong><?= htmlspecialchars($item['nome_prodotto'] ?? $item['product_name']) ?></strong></td>
-                <td><?= number_format($item['prezzo_unitario'] ?? $item['unit_price'], 2, ',', '.') ?> €</td>
+                <td><strong><?= htmlspecialchars($item['nome_prodotto']) ?></strong></td>
+                <td><?= number_format($item['prezzo_unitario'], 2, ',', '.') ?> €</td>
                 <td>
                   <form method="post" action="/carrello_aggiorna.php" style="display: inline-flex; align-items: center; gap: 0.5rem;">
                     <?= campo_csrf() ?>
                     <input type="hidden" name="id_articolo" value="<?= (int)$item['id'] ?>">
-                    <input type="number" name="quantita" value="<?= (int)($item['quantita'] ?? $item['quantity']) ?>" min="1" max="<?= (int)($item['quantita_giacenza'] ?? $item['stock_qty']) ?>" class="qty-input" style="width: 70px; padding: 0.5rem; border: 2px solid var(--gray-light); border-radius: var(--radius); text-align: center;">
+                    <input type="number" name="quantita" value="<?= (int)$item['quantita'] ?>" min="1" max="<?= (int)$item['quantita_giacenza'] ?>" class="qty-input" style="width: 70px; padding: 0.5rem; border: 2px solid var(--gray-light); border-radius: var(--radius); text-align: center;">
                     <button type="submit" class="btn btn-sm btn-primary">✓</button>
                   </form>
                 </td>
-                <td><strong style="color: var(--secondary); font-size: 1.125rem;"><?= number_format($item['totale_riga'] ?? $item['line_total'], 2, ',', '.') ?> €</strong></td>
+                <td><strong style="color: var(--secondary); font-size: 1.125rem;"><?= number_format($item['totale_riga'], 2, ',', '.') ?> €</strong></td>
                 <td>
                   <form method="post" action="/carrello_rimuovi.php" style="display: inline;">
                     <?= campo_csrf() ?>

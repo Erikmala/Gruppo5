@@ -36,7 +36,7 @@ if (empty($cartItems)) {
 
 $total = 0;
 foreach ($cartItems as $item) {
-    $total += (float)$item['line_total'];
+    $total += (float)$item['totale_riga'];
 }
 
 // Get user addresses
@@ -83,8 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$address) {
             $errors[] = 'Indirizzo non valido.';
         }
-    } else if (!$errors) {
-        $errors[] = 'Seleziona un indirizzo di spedizione.';
+    } else if (!$errors && !isset($_POST['create_address'])) {
+        $errors[] = 'Seleziona un indirizzo di spedizione o creane uno nuovo.';
     }
 
     // Process order
@@ -105,13 +105,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 db_run(
                     'INSERT INTO articoli_ordine (ordine_id, prodotto_id, quantita, prezzo_unitario) 
                      VALUES (?, ?, ?, ?)',
-                    [$orderId, (int)($item['id_prodotto'] ?? $item['product_id']), (int)($item['quantita'] ?? $item['quantity']), ($item['prezzo_unitario'] ?? $item['unit_price'])]
+                    [$orderId, (int)$item['prodotto_id'], (int)$item['quantita'], $item['prezzo_unitario']]
                 );
 
                 // Decrease stock
                 db_run(
                     'UPDATE prodotti SET quantita_giacenza = quantita_giacenza - ? WHERE id = ?',
-                    [(int)($item['quantita'] ?? $item['quantity']), (int)($item['id_prodotto'] ?? $item['product_id'])]
+                    [(int)$item['quantita'], (int)$item['prodotto_id']]
                 );
             }
 
@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="header-content">
   <a href="/" class="logo">🛒 Tech Hub</a>
       <nav class="nav">
-        <span class="text-muted">Ciao, <strong><?= htmlspecialchars($user['nome'] ?? $user['first_name'] ?? 'Utente') ?></strong></span>
+        <span class="text-muted">Ciao, <strong><?= htmlspecialchars($user['nome'] ?? 'Utente') ?></strong></span>
       </nav>
     </div>
   </header>
@@ -180,8 +180,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2 class="card-header" style="font-size: 1.25rem;">📦 Riepilogo Ordine</h2>
         <?php foreach ($cartItems as $item): ?>
           <div class="flex-between" style="padding: 0.75rem 0; border-bottom: 1px solid var(--gray-light);">
-            <span><strong><?= htmlspecialchars($item['product_name']) ?></strong> × <?= (int)$item['quantity'] ?></span>
-            <span style="font-weight: 600;"><?= number_format($item['line_total'], 2, ',', '.') ?> €</span>
+            <span><strong><?= htmlspecialchars($item['nome_prodotto']) ?></strong> × <?= (int)$item['quantita'] ?></span>
+            <span style="font-weight: 600;"><?= number_format($item['totale_riga'], 2, ',', '.') ?> €</span>
           </div>
         <?php endforeach; ?>
         <div class="flex-between" style="padding-top: 1rem; margin-top: 1rem; border-top: 2px solid var(--dark); font-size: 1.5rem; font-weight: 800;">
@@ -200,12 +200,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div style="display: grid; gap: 1rem;">
               <?php foreach ($addresses as $addr): ?>
                 <label style="border: 2px solid var(--gray-light); padding: 1rem; border-radius: var(--radius); cursor: pointer; transition: var(--transition); display: flex; align-items: start; gap: 1rem;">
-                  <input type="radio" name="address_id" value="<?= (int)$addr['id'] ?>" required style="margin-top: 0.25rem;">
+                  <input type="radio" name="address_id" value="<?= (int)$addr['id'] ?>" class="existing-address-radio" style="margin-top: 0.25rem;">
                   <div>
-                    <div style="font-weight: 700; margin-bottom: 0.25rem;"><?= htmlspecialchars($addr['full_name']) ?></div>
+                    <div style="font-weight: 700; margin-bottom: 0.25rem;"><?= htmlspecialchars($addr['nome_completo']) ?></div>
                     <div style="color: var(--gray); font-size: 0.875rem;">
-                      <?= htmlspecialchars($addr['line1']) ?><br>
-                      <?= htmlspecialchars($addr['city']) ?> <?= htmlspecialchars($addr['postal_code']) ?>, <?= htmlspecialchars($addr['country']) ?>
+                      <?= htmlspecialchars($addr['indirizzo_riga1']) ?><br>
+                      <?= htmlspecialchars($addr['citta']) ?> <?= htmlspecialchars($addr['codice_postale']) ?>, <?= htmlspecialchars($addr['paese']) ?>
                     </div>
                   </div>
                 </label>
@@ -224,23 +224,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div id="new_address_fields" style="display: none;">
               <div class="form-group">
                 <label for="full_name">Nome Completo</label>
-                <input type="text" id="full_name" name="full_name" placeholder="Mario Rossi">
+                <input type="text" id="full_name" name="full_name" placeholder="Mario Rossi" class="new-address-field">
               </div>
               <div class="form-group">
                 <label for="line1">Indirizzo</label>
-                <input type="text" id="line1" name="line1" placeholder="Via Roma 123">
+                <input type="text" id="line1" name="line1" placeholder="Via Roma 123" class="new-address-field">
               </div>
               <div class="form-group">
                 <label for="city">Città</label>
-                <input type="text" id="city" name="city" placeholder="Bologna">
+                <input type="text" id="city" name="city" placeholder="Bologna" class="new-address-field">
               </div>
               <div class="form-group">
                 <label for="postal_code">CAP</label>
-                <input type="text" id="postal_code" name="postal_code" placeholder="40100">
+                <input type="text" id="postal_code" name="postal_code" placeholder="40100" class="new-address-field">
               </div>
               <div class="form-group">
                 <label for="country">Nazione</label>
-                <select id="country" name="country">
+                <select id="country" name="country" class="new-address-field">
                   <option value="IT">Italia</option>
                   <option value="FR">Francia</option>
                   <option value="DE">Germania</option>
@@ -260,9 +260,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 
   <script>
-    document.getElementById('new_address_toggle')?.addEventListener('change', function() {
-      document.getElementById('new_address_fields').style.display = this.checked ? 'block' : 'none';
+    const toggle = document.getElementById('new_address_toggle');
+    const newAddressFields = document.getElementById('new_address_fields');
+    const existingAddressRadios = document.querySelectorAll('.existing-address-radio');
+    const newAddressInputs = document.querySelectorAll('.new-address-field');
+
+    toggle?.addEventListener('change', function() {
+      const isCreatingNew = this.checked;
+      
+      // Mostra/nascondi i campi del nuovo indirizzo
+      newAddressFields.style.display = isCreatingNew ? 'block' : 'none';
+      
+      // Gestisci required per indirizzi esistenti
+      existingAddressRadios.forEach(radio => {
+        radio.required = !isCreatingNew;
+      });
+      
+      // Gestisci required per campi nuovo indirizzo
+      newAddressInputs.forEach(input => {
+        input.required = isCreatingNew;
+      });
+      
+      // Deseleziona indirizzi esistenti se si crea uno nuovo
+      if (isCreatingNew) {
+        existingAddressRadios.forEach(radio => {
+          radio.checked = false;
+        });
+      }
     });
+
+    // Se non ci sono indirizzi esistenti, rendi obbligatorio il nuovo
+    if (existingAddressRadios.length === 0 && toggle) {
+      toggle.checked = true;
+      toggle.dispatchEvent(new Event('change'));
+    }
   </script>
 </body>
 </html>
