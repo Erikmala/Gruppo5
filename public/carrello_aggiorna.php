@@ -3,10 +3,10 @@ require __DIR__ . '/../includes/sessione.php';
 require __DIR__ . '/../includes/connessione_db.php';
 require __DIR__ . '/../includes/autenticazione.php';
 
-require_login();
+richiedi_login();
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validate()) {
-    header('Location: /cart.php');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !valida_csrf()) {
+    header('Location: /carrello.php');
     exit;
 }
 
@@ -14,12 +14,12 @@ $itemId = (int)($_POST['id_articolo'] ?? $_POST['item_id'] ?? 0);
 $quantity = (int)($_POST['quantita'] ?? $_POST['quantity'] ?? 1);
 
 if ($itemId <= 0 || $quantity <= 0) {
-    header('Location: /cart.php');
+    header('Location: /carrello.php');
     exit;
 }
 
 try {
-    $userId = current_user_id();
+    $userId = id_utente_corrente();
     
     // Verifica che l'articolo appartenga al carrello dell'utente e controlla giacenza
     $item = db_run(
@@ -36,10 +36,10 @@ try {
         db_run('UPDATE articoli_carrello SET quantita = ? WHERE id = ?', [$quantity, $itemId]);
     }
 
-    header('Location: /cart.php');
+    header('Location: /carrello.php');
     exit;
 
 } catch (Throwable $e) {
-    header('Location: /cart.php?error=1');
+    header('Location: /carrello.php?error=1');
     exit;
 }

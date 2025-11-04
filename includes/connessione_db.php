@@ -1,18 +1,6 @@
 <?php
-/**
- * Helper di connessione al database (PDO, MySQL)
- *
- * - Carica le variabili d'ambiente da un file .env locale se presente (nessun Composer necessario)
- * - Crea un'unica istanza PDO condivisa con impostazioni sicure
- * - Espone funzioni helper: db() e esegui_db()
- *
- * Utilizzo:
- *   require __DIR__ . '/db_connect.php';
- *   $pdo = db();
- *   $righe = esegui_db('SELECT NOW() AS adesso')->fetchAll();
- */
 
-// --- Caricatore .env minimale (opzionale). Cerca ../.env per default ---
+
 (function () {
     $percorsoEnv = __DIR__ . '/../.env';
     if (!is_readable($percorsoEnv)) {
@@ -61,7 +49,7 @@ $DB_SSL_CA = getenv('DB_SSL_CA') ?: null; // percorso al bundle CA se necessario
 // --- Costruisci DSN ---
 $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=%s', $DB_HOST, $DB_PORT, $DB_NAME, $DB_CHSET);
 
-// --- Opzioni PDO (valori predefiniti sicuri) ---
+// --- Opzioni PDO ---
 $PDO_OPTIONS = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // lancia eccezioni
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,       // array associativi
@@ -96,23 +84,14 @@ function db(): PDO {
     }
 }
 
-/**
- * Helper di convenienza per eseguire prepared statement velocemente.
- * Esempio: $riga = esegui_db('SELECT * FROM utenti WHERE id = ?', [$id])->fetch();
- */
-function esegui_db(string $sql, array $parametri = []): PDOStatement {
+function db_run(string $sql, array $params = []): PDOStatement {
     $stmt = db()->prepare($sql);
-    foreach ($parametri as $i => $val) {
+    foreach ($params as $i => $val) {
         // Bind parametri posizionali 1-indexed
         $stmt->bindValue($i + 1, $val);
     }
     $stmt->execute();
     return $stmt;
-}
-
-// Alias per retrocompatibilità - manteniamo db_run() perché molto usato nel codice
-function db_run(string $sql, array $params = []): PDOStatement {
-    return esegui_db($sql, $params);
 }
 
 ?>

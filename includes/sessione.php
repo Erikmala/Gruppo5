@@ -1,13 +1,6 @@
 <?php
-/**
- * Bootstrap sicurezza sessione + helper
- * - Parametri cookie sicuri (HttpOnly, SameSite=Lax, Secure quando https)
- * - Avvio sessione con modalità strict
- * - Rigenera ID su cambio privilegio
- * - Helper token CSRF
- */
 
-// Rileva HTTPS (funziona anche dietro proxy se impostano X-Forwarded-Proto)
+// Rileva HTTPS
 function e_https(): bool {
     if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') return true;
     if (!empty($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) return true;
@@ -56,9 +49,6 @@ function rigenera_sessione(): void {
     }
 }
 
-/**
- * Helper semplici per stato login
- */
 function utente_connesso(): bool {
     return !empty($_SESSION['id_utente']);
 }
@@ -73,7 +63,7 @@ function ruolo_utente_corrente(): ?string {
 
 function richiedi_login(): void {
     if (!utente_connesso()) {
-        header('Location: /login.php');
+        header('Location: /accedi.php');
         exit;
     }
 }
@@ -86,9 +76,6 @@ function richiedi_admin(): void {
     }
 }
 
-/**
- * Helper CSRF
- */
 function token_csrf(): string {
     if (empty($_SESSION['token_csrf'])) {
         $_SESSION['token_csrf'] = bin2hex(random_bytes(32));
@@ -105,25 +92,6 @@ function valida_csrf(): bool {
     $token = $_POST['token_csrf'] ?? '';
     return is_string($token) && $token !== '' && hash_equals($_SESSION['token_csrf'] ?? '', $token);
 }
-
-// Alias per retrocompatibilità (da rimuovere gradualmente)
-function is_https(): bool {
-    return e_https();
-}
-
-function session_boot(): void {
-    avvia_sessione();
-}
-
-// Alias per compatibilità temporanea durante testing
-function is_logged_in(): bool { return utente_connesso(); }
-function current_user_id(): ?int { return id_utente_corrente(); }
-function current_user_role(): ?string { return ruolo_utente_corrente(); }
-function require_login(): void { richiedi_login(); }
-function require_admin(): void { richiedi_admin(); }
-function csrf_field(): string { return campo_csrf(); }
-function csrf_validate(): bool { return valida_csrf(); }
-function csrf_token(): string { return token_csrf(); }
 
 // Avvia automaticamente le sessioni per tutte le richieste che includono questo file
 avvia_sessione();

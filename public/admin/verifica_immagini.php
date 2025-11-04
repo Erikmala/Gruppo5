@@ -1,12 +1,9 @@
 <?php
-/**
- * Pagina di verifica immagini prodotti (solo per admin/dev)
- */
 
-require __DIR__ . '/../includes/sessione.php';
-require __DIR__ . '/../includes/connessione_db.php';
-require __DIR__ . '/../includes/autenticazione.php';
-require __DIR__ . '/../includes/helper_immagini.php';
+require __DIR__ . '/../../includes/sessione.php';
+require __DIR__ . '/../../includes/connessione_db.php';
+require __DIR__ . '/../../includes/autenticazione.php';
+require __DIR__ . '/../../includes/helper_immagini.php';
 
 // Solo per admin
 richiedi_login();

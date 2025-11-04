@@ -4,16 +4,16 @@ require __DIR__ . '/../includes/connessione_db.php';
 require __DIR__ . '/../includes/autenticazione.php';
 require __DIR__ . '/../includes/helper_immagini.php';
 
-require_login();
+richiedi_login();
 
-$userId = current_user_id();
-$user = get_logged_user();
+$userId = id_utente_corrente();
+$user = ottieni_utente_connesso();
 
 // Get user's open cart
 $cart = db_run('SELECT id FROM carrelli WHERE utente_id = ? LIMIT 1', [$userId])->fetch();
 
 if (!$cart) {
-    header('Location: /cart.php');
+    header('Location: /carrello.php');
     exit;
 }
 
@@ -30,7 +30,7 @@ $cartId = (int)$cart['id'];
 )->fetchAll();
 
 if (empty($cartItems)) {
-    header('Location: /cart.php');
+    header('Location: /carrello.php');
     exit;
 }
 
@@ -46,7 +46,7 @@ $errors = [];
 $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!csrf_validate()) {
+    if (!valida_csrf()) {
         $errors[] = 'Token CSRF non valido.';
     }
 
@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2 class="card-header" style="font-size: 1.25rem;">📍 Indirizzo di Spedizione</h2>
         
         <form method="post" action="" class="form">
-          <?= csrf_field() ?>
+          <?= campo_csrf() ?>
           
           <?php if (!empty($addresses)): ?>
             <div style="display: grid; gap: 1rem;">

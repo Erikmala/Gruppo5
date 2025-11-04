@@ -3,9 +3,9 @@ require __DIR__ . '/../../includes/sessione.php';
 require __DIR__ . '/../../includes/connessione_db.php';
 require __DIR__ . '/../../includes/autenticazione.php';
 
-require_admin();
+richiedi_admin();
 
-$user = get_logged_user();
+$user = ottieni_utente_connesso();
 
 // Helpers
 function fmt_currency(float $v, string $cur = 'EUR'): string {
@@ -155,7 +155,7 @@ $recentOrders = db_run(
                   <td><?= htmlspecialchars($acc['bloccato_fino_a'] ?? $acc['locked_until'] ?? '') ?></td>
                   <td>
                     <form method="post" action="/admin/sblocca_utente.php" style="display: inline;">
-                      <?= csrf_field() ?>
+                      <?= campo_csrf() ?>
                       <input type="hidden" name="user_id" value="<?= (int)$acc['id'] ?>">
                       <button type="submit" class="btn btn-sm btn-secondary">🔓 Sblocca</button>
                     </form>

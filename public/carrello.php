@@ -4,10 +4,10 @@ require __DIR__ . '/../includes/connessione_db.php';
 require __DIR__ . '/../includes/autenticazione.php';
 require __DIR__ . '/../includes/helper_immagini.php';
 
-require_login();
+richiedi_login();
 
-$userId = current_user_id();
-$user = get_logged_user();
+$userId = id_utente_corrente();
+$user = ottieni_utente_connesso();
 
 // Ottieni carrello dell'utente
 $cart = db_run('SELECT id FROM carrelli WHERE utente_id = ? LIMIT 1', [$userId])->fetch();
@@ -87,7 +87,7 @@ $showAdded = isset($_GET['added']);
             <?php foreach ($cartItems as $item): ?>
               <tr>
                 <td>
-                  <img src="<?= htmlspecialchars(get_product_image_url($item['codice_sku'] ?? $item['sku'])) ?>" 
+                  <img src="<?= htmlspecialchars(ottieni_url_immagine_prodotto($item['codice_sku'] ?? $item['sku'])) ?>" 
                        alt="<?= htmlspecialchars($item['nome_prodotto'] ?? $item['product_name']) ?>" 
                        style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
                 </td>
@@ -95,7 +95,7 @@ $showAdded = isset($_GET['added']);
                 <td><?= number_format($item['prezzo_unitario'] ?? $item['unit_price'], 2, ',', '.') ?> €</td>
                 <td>
                   <form method="post" action="/carrello_aggiorna.php" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                    <?= csrf_field() ?>
+                    <?= campo_csrf() ?>
                     <input type="hidden" name="id_articolo" value="<?= (int)$item['id'] ?>">
                     <input type="number" name="quantita" value="<?= (int)($item['quantita'] ?? $item['quantity']) ?>" min="1" max="<?= (int)($item['quantita_giacenza'] ?? $item['stock_qty']) ?>" class="qty-input" style="width: 70px; padding: 0.5rem; border: 2px solid var(--gray-light); border-radius: var(--radius); text-align: center;">
                     <button type="submit" class="btn btn-sm btn-primary">✓</button>
@@ -104,7 +104,7 @@ $showAdded = isset($_GET['added']);
                 <td><strong style="color: var(--secondary); font-size: 1.125rem;"><?= number_format($item['totale_riga'] ?? $item['line_total'], 2, ',', '.') ?> €</strong></td>
                 <td>
                   <form method="post" action="/carrello_rimuovi.php" style="display: inline;">
-                    <?= csrf_field() ?>
+                    <?= campo_csrf() ?>
                     <input type="hidden" name="id_articolo" value="<?= (int)$item['id'] ?>">
                     <button type="submit" class="btn btn-sm btn-danger">🗑️ Rimuovi</button>
                   </form>

@@ -1,8 +1,4 @@
 <?php
-/**
- * Eliminazione Account Utente (GDPR - Diritto alla Cancellazione)
- * Consente all'utente di eliminare permanentemente il proprio account
- */
 
 require __DIR__ . '/../includes/sessione.php';
 require __DIR__ . '/../includes/connessione_db.php';
@@ -22,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['conferma_cancellazion
         try {
             db()->beginTransaction();
             
-            // Elimina dati correlati all'utente (rispetta vincoli foreign key)
+            // Elimina dati correlati all'utente
             db_run('DELETE FROM articoli_carrello WHERE carrello_id IN (SELECT id FROM carrelli WHERE utente_id = ?)', [$idUtente]);
             db_run('DELETE FROM carrelli WHERE utente_id = ?', [$idUtente]);
             db_run('DELETE FROM articoli_ordine WHERE ordine_id IN (SELECT id FROM ordini WHERE utente_id = ?)', [$idUtente]);

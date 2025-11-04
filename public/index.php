@@ -128,8 +128,8 @@ $user = ottieni_utente_connesso();
           <div class="product-card">
             <div class="product-image">
               <?php 
-                $imageUrl = get_product_image_url($product['codice_sku'] ?? $product['sku'], $product['url_immagine'] ?? $product['image_url'] ?? null);
-                $imageAlt = get_product_image_alt($product['nome'] ?? $product['name'], $product['testo_alternativo_immagine'] ?? $product['image_alt'] ?? null);
+                $imageUrl = ottieni_url_immagine_prodotto($product['codice_sku'] ?? $product['sku'], $product['url_immagine'] ?? $product['image_url'] ?? null);
+                $imageAlt = ottieni_testo_alternativo_prodotto($product['nome'] ?? $product['name'], $product['testo_alternativo_immagine'] ?? $product['image_alt'] ?? null);
               ?>
               <img src="<?= htmlspecialchars($imageUrl) ?>" alt="<?= htmlspecialchars($imageAlt) ?>">
             </div>
@@ -152,7 +152,7 @@ $user = ottieni_utente_connesso();
                 </div>
                 <?php if (utente_connesso() && (int)($product['quantita_giacenza'] ?? $product['stock_qty']) > 0): ?>
                   <form method="post" action="/carrello_aggiungi.php" style="margin: 0;">
-                    <?= csrf_field() ?>
+                    <?= campo_csrf() ?>
                     <input type="hidden" name="id_prodotto" value="<?= (int)$product['id'] ?>">
                     <button type="submit" class="btn btn-sm btn-secondary">+ Carrello</button>
                   </form>
@@ -195,7 +195,7 @@ $user = ottieni_utente_connesso();
 
       if (!form || !input || !grid) return;
 
-      // Debounce util
+      
       function debounce(fn, wait) {
         let t; return function(...args){ clearTimeout(t); t = setTimeout(() => fn.apply(this, args), wait); };
       }

@@ -1,7 +1,7 @@
 <?php
 /**
- * Helper di autenticazione
- * Centralizza la logica di login, blocco account, registrazione tentativi
+ * Autenticazione
+ * Logica di login, blocco account, registrazione tentativi
  */
 
 require_once __DIR__ . '/connessione_db.php';
@@ -32,7 +32,6 @@ function registra_tentativo_autenticazione(
 
 /**
  * Verifica se l'account utente è attualmente bloccato
- * Ritorna array: ['bloccato' => bool, 'minuti_rimanenti' => int]
  */
 function account_bloccato(int $idUtente): array {
     $riga = db_run(
@@ -62,7 +61,6 @@ function account_bloccato(int $idUtente): array {
 
 /**
  * Incrementa il contatore dei tentativi falliti e blocca l'account se si raggiunge la soglia
- * Ritorna array con 'bloccato' (bool) e 'tentativi_rimanenti' (int)
  */
 function gestisci_login_fallito(int $idUtente): array {
     $utente = db_run(
@@ -105,7 +103,6 @@ function resetta_tentativi_falliti(int $idUtente): void {
 
 /**
  * Tenta login con email e password
- * Ritorna array: ['successo' => bool, 'errore' => string|null, 'id_utente' => int|null, 'ruolo' => string|null]
  */
 function tentativo_login(string $email, string $password): array {
     $email = trim($email);
@@ -194,7 +191,3 @@ function ottieni_utente_connesso(): ?array {
 
     return $utente ?: null;
 }
-
-// Alias per compatibilità temporanea durante testing
-function get_logged_user(): ?array { return ottieni_utente_connesso(); }
-function attempt_login(string $email, string $password): array { return tentativo_login($email, $password); }

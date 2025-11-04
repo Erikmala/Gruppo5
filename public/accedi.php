@@ -6,7 +6,7 @@ require __DIR__ . '/../includes/autenticazione.php';
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!csrf_validate()) {
+    if (!valida_csrf()) {
         $errors[] = 'Token CSRF non valido.';
     }
 
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php endif; ?>
 
       <form method="post" action="" class="form">
-        <?= csrf_field() ?>
+        <?= campo_csrf() ?>
         
         <div class="form-group">
           <label for="email">📧 Email</label>

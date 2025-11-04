@@ -3,14 +3,14 @@ require __DIR__ . '/../includes/sessione.php';
 require __DIR__ . '/../includes/connessione_db.php';
 require __DIR__ . '/../includes/autenticazione.php';
 
-require_login();
+richiedi_login();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: /');
     exit;
 }
 
-if (!csrf_validate()) {
+if (!valida_csrf()) {
     die('Token CSRF non valido.');
 }
 
@@ -36,7 +36,7 @@ try {
         exit;
     }
 
-    $userId = current_user_id();
+    $userId = id_utente_corrente();
 
     // Ottieni o crea carrello per utente
     $cart = db_run('SELECT id FROM carrelli WHERE utente_id = ? LIMIT 1', [$userId])->fetch();
@@ -60,11 +60,9 @@ try {
         db_run('INSERT INTO articoli_carrello (carrello_id, prodotto_id, quantita, prezzo_unitario, aggiunto_il) VALUES (?, ?, ?, ?, NOW())', 
                [$cartId, $productId, $quantity, $product['prezzo']]);
     }
-
-    header('Location: /cart.php?added=1');
-    exit;
-
-} catch (Throwable $e) {
+    
+    header('Location: /carrello.php?added=1');
+    exit;} catch (Throwable $e) {
     header('Location: /?error=cart_error');
     exit;
 }

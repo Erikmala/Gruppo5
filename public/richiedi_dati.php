@@ -1,8 +1,4 @@
 <?php
-/**
- * Richiesta Dati Utente (GDPR - Diritto di Portabilità)
- * Consente all'utente di scaricare i propri dati in formato CSV
- */
 
 require __DIR__ . '/../includes/sessione.php';
 require __DIR__ . '/../includes/connessione_db.php';

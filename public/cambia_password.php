@@ -3,13 +3,13 @@ require __DIR__ . '/../includes/sessione.php';
 require __DIR__ . '/../includes/connessione_db.php';
 require __DIR__ . '/../includes/autenticazione.php';
 
-require_login();
+richiedi_login();
 
 $errors = [];
 $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!csrf_validate()) {
+    if (!valida_csrf()) {
         $errors[] = 'Token CSRF non valido.';
     }
 
@@ -45,18 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$errors) {
         try {
-            $userId = current_user_id();
+            $userId = id_utente_corrente();
             $user = db_run('SELECT id, hash_password FROM utenti WHERE id = ? LIMIT 1', [$userId])->fetch();
             if (!$user) {
                 $errors[] = 'Utente non trovato.';
             } else {
                 // Verify current password
-                if (!password_verify($current, $user['password_hash'])) {
+                if (!password_verify($current, $user['hash_password'])) {
                     $errors[] = 'La password attuale non è corretta.';
                 }
 
                 // Ensure new password differs from current
-                if (password_verify($password, $user['password_hash'])) {
+                if (password_verify($password, $user['hash_password'])) {
                     $errors[] = 'La nuova password deve essere diversa da quella attuale.';
                 }
 
@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php endif; ?>
 
       <form method="post" action="" class="form">
-        <?= csrf_field() ?>
+        <?= campo_csrf() ?>
 
         <div class="form-group">
           <label for="current_password">🔒 Password Attuale</label>

@@ -112,8 +112,8 @@ if (!$products || count($products) === 0) {
 }
 
 foreach ($products as $product) {
-    $imageUrl = get_product_image_url($product['codice_sku'] ?? $product['sku'], $product['url_immagine'] ?? $product['image_url'] ?? null);
-    $imageAlt = get_product_image_alt($product['nome'] ?? $product['name'], $product['testo_alternativo_immagine'] ?? $product['image_alt'] ?? null);
+    $imageUrl = ottieni_url_immagine_prodotto($product['codice_sku'] ?? $product['sku'], $product['url_immagine'] ?? $product['image_url'] ?? null);
+    $imageAlt = ottieni_testo_alternativo_prodotto($product['nome'] ?? $product['name'], $product['testo_alternativo_immagine'] ?? $product['image_alt'] ?? null);
     $categorie = htmlspecialchars($product['categorie'] ?? $product['categories'] ?? 'Generale');
     $nome = htmlspecialchars($product['nome'] ?? $product['name']);
     $desc = htmlspecialchars($product['descrizione'] ?? $product['description'] ?? '');
@@ -145,7 +145,7 @@ foreach ($products as $product) {
 
     if (utente_connesso() && $stock > 0) {
         echo '      <form method="post" action="/carrello_aggiungi.php" style="margin: 0;">';
-        echo csrf_field();
+        echo campo_csrf();
         echo '        <input type="hidden" name="id_prodotto" value="' . $id . '">';
         echo '        <button type="submit" class="btn btn-sm btn-secondary">+ Carrello</button>';
         echo '      </form>';

@@ -6,7 +6,7 @@ $errors = [];
 $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!csrf_validate()) {
+    if (!valida_csrf()) {
         $errors[] = 'Token CSRF non valido.';
     }
 
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <?php if (!$success): ?>
         <form method="post" action="" class="form">
-          <?= csrf_field() ?>
+          <?= campo_csrf() ?>
           
           <div class="form-group">
             <label for="full_name">🙎🏻‍♂️ Nome Completo</label>

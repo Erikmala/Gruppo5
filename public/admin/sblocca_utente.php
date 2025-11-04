@@ -3,9 +3,9 @@ require __DIR__ . '/../../includes/sessione.php';
 require __DIR__ . '/../../includes/connessione_db.php';
 require __DIR__ . '/../../includes/autenticazione.php';
 
-require_admin();
+richiedi_admin();
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validate()) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !valida_csrf()) {
     header('Location: /admin/pannello.php');
     exit;
 }
