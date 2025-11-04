@@ -92,7 +92,7 @@ $recentOrders = db_run(
     <div class="header-content">
       <a href="/admin/pannello.php" class="logo" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🔒 Admin Dashboard</a>
       <nav class="nav">
-        <span class="text-muted">Admin: <strong><?= htmlspecialchars($user['nome'] ?? $user['first_name'] ?? 'Admin') ?></strong></span>
+        <span class="text-muted">Admin: <strong><?= htmlspecialchars($user['nome'] ?? 'Admin') ?></strong></span>
         <a href="/" class="nav-link">Vai al Sito</a>
         <a href="/cambia_password.php" class="nav-link">Cambia password</a>
         <a href="/esci.php" class="btn btn-sm btn-danger">Esci</a>
@@ -150,9 +150,9 @@ $recentOrders = db_run(
             <tbody>
               <?php foreach ($lockedAccounts as $acc): ?>
                 <tr>
-                  <td><strong><?= htmlspecialchars($acc['email']) ?></strong></td>
-                  <td><span class="badge badge-danger"><?= (int)($acc['conteggio_tentativi_falliti'] ?? $acc['failed_login_count'] ?? 0) ?> tentativi</span></td>
-                  <td><?= htmlspecialchars($acc['bloccato_fino_a'] ?? $acc['locked_until'] ?? '') ?></td>
+                  <td><strong><?= htmlspecialchars($acc['email'] ?? '') ?></strong></td>
+                  <td><span class="badge badge-danger"><?= (int)($acc['conteggio_tentativi_falliti'] ?? 0) ?> tentativi</span></td>
+                  <td><?= htmlspecialchars($acc['bloccato_fino_a'] ?? '') ?></td>
                   <td>
                     <form method="post" action="/admin/sblocca_utente.php" style="display: inline;">
                       <?= campo_csrf() ?>
@@ -189,12 +189,12 @@ $recentOrders = db_run(
             <tbody>
               <?php foreach ($failedAttempts as $attempt): ?>
                 <tr>
-                  <td><strong><?= htmlspecialchars($attempt['email_attempted']) ?></strong></td>
+                  <td><strong><?= htmlspecialchars($attempt['email_tentata'] ?? '') ?></strong></td>
                   <td><code><?= htmlspecialchars($attempt['ip'] ?? 'N/D') ?></code></td>
                   <td>
                     <?php
-                      $label = reason_label($attempt['reason'] ?? 'OTHER');
-                      $reasonColor = match($attempt['reason'] ?? 'OTHER') {
+                      $label = reason_label($attempt['motivo'] ?? 'OTHER');
+                      $reasonColor = match($attempt['motivo'] ?? 'OTHER') {
                         'WRONG_PASSWORD' => 'danger',
                         'UNKNOWN_EMAIL' => 'warning',
                         'LOCKED', 'TOO_MANY_ATTEMPTS' => 'danger',
@@ -203,7 +203,7 @@ $recentOrders = db_run(
                     ?>
                     <span class="badge badge-<?= $reasonColor ?>"><?= htmlspecialchars($label) ?></span>
                   </td>
-                  <td><?= fmt_date($attempt['creato_il'] ?? $attempt['created_at'] ?? '') ?></td>
+                  <td><?= fmt_date($attempt['creato_il'] ?? '') ?></td>
                 </tr>
               <?php endforeach; ?>
             </tbody>
@@ -235,21 +235,21 @@ $recentOrders = db_run(
               <?php foreach ($recentOrders as $order): ?>
                 <tr>
                   <td><strong>#<?= (int)$order['id'] ?></strong></td>
-                  <td><?= htmlspecialchars($order['user_email']) ?></td>
-                  <td><strong style="color: var(--secondary);"><?= fmt_currency((float)$order['total_amount']) ?></strong></td>
+                  <td><?= htmlspecialchars($order['email_utente'] ?? '') ?></td>
+                  <td><strong style="color: var(--secondary);"><?= fmt_currency((float)($order['importo_totale'] ?? 0)) ?></strong></td>
                   <td>
                     <?php
-                    $statusConfig = match($order['status']) {
-                      'completed' => ['class' => 'success', 'icon' => '✅'],
-                      'pending' => ['class' => 'warning', 'icon' => '⏳'],
+                    $statusConfig = match($order['stato'] ?? 'pending') {
+                      'completato' => ['class' => 'success', 'icon' => '✅'],
+                      'in_attesa' => ['class' => 'warning', 'icon' => '⏳'],
                       default => ['class' => 'info', 'icon' => '❓']
                     };
                     ?>
                     <span class="badge badge-<?= $statusConfig['class'] ?>">
-                      <?= $statusConfig['icon'] ?> <?= ucfirst($order['status']) ?>
+                      <?= $statusConfig['icon'] ?> <?= ucfirst($order['stato'] ?? '') ?>
                     </span>
                   </td>
-                  <td><?= fmt_date($order['placed_at'] ?? '') ?></td>
+                  <td><?= fmt_date($order['effettuato_il'] ?? '') ?></td>
                 </tr>
               <?php endforeach; ?>
             </tbody>
