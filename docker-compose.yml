@@ -27,7 +27,7 @@ services:
       MYSQL_USER: tech_hub_user
       MYSQL_PASSWORD: admin123
     volumes:
-      - ./sql:/docker-entrypoint-initdb.d:ro   # esegue database.sql e simulazione.sql al primo avvio
+      - ./sql:/docker-entrypoint-initdb.d:ro   # esegue database.sql e simulazione.sql al primo avvio del container
       - dbdata:/var/lib/mysql
 
   phpmyadmin:

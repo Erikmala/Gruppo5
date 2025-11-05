@@ -40,7 +40,6 @@ if ($q !== '') {
 }
 
 if ($categoria !== '') {
-    // Usa EXISTS per non alterare la cardinalità del GROUP BY
     $where .= ' AND EXISTS (
                     SELECT 1 FROM prodotti_categorie pc2
                     JOIN categorie c2 ON c2.id = pc2.categoria_id

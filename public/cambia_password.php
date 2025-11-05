@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Compila tutti i campi.';
     }
 
-    // Strong password policy (same as register.php)
+    // definisci i requisiti per la password (same as register.php)
     if (strlen($password) < 8) {
         $errors[] = 'La nuova password deve avere almeno 8 caratteri.';
     }
@@ -50,12 +50,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$user) {
                 $errors[] = 'Utente non trovato.';
             } else {
-                // Verify current password
+                // verifica password attuale
                 if (!password_verify($current, $user['hash_password'])) {
                     $errors[] = 'La password attuale non è corretta.';
                 }
 
-                // Ensure new password differs from current
+                // Assicurati che la nuova password sia diversa da quella attuale
                 if (password_verify($password, $user['hash_password'])) {
                     $errors[] = 'La nuova password deve essere diversa da quella attuale.';
                 }

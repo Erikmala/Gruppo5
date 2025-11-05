@@ -6,6 +6,6 @@ html/
 *.tmp
 *.log
 
-# File di sistema
+# File di sistema 
 .DS_Store
 Thumbs.db

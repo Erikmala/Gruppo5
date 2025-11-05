@@ -18,10 +18,10 @@ RUN bash -lc 'echo "ServerName localhost" > /etc/apache2/conf-available/serverna
 # Rimuovi la cartella html di default (non la usiamo)
 RUN rm -rf /var/www/html
 
-# Imposta la working directory su /var/www invece di /var/www/html
+# Imposta la working directory su /var/www invece di /var/www/html 
 WORKDIR /var/www
 
-# Crea uno script di avvio personalizzato per eliminare html ad ogni avvio
+# Crea uno script di avvio personalizzato per eliminare html ad ogni avvio del container
 RUN echo '#!/bin/bash\nrm -rf /var/www/html 2>/dev/null || true\nexec apache2-foreground "$@"' > /usr/local/bin/custom-entrypoint.sh \
  && chmod +x /usr/local/bin/custom-entrypoint.sh
 

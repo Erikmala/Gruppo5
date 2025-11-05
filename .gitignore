@@ -8,13 +8,13 @@
 *.swo
 *~
 
-# OS
+# System files
 .DS_Store
 Thumbs.db
 
-# Logs
+# log files
 *.log
 
-# Temporary files
+# file e cartelle temporanee
 tmp/
 temp/

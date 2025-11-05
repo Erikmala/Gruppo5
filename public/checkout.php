@@ -9,7 +9,7 @@ richiedi_login();
 $userId = id_utente_corrente();
 $user = ottieni_utente_connesso();
 
-// Get user's open cart
+// prendi il carrello dell'utente
 $cart = db_run('SELECT id FROM carrelli WHERE utente_id = ? LIMIT 1', [$userId])->fetch();
 
 if (!$cart) {
@@ -19,7 +19,7 @@ if (!$cart) {
 
 $cartId = (int)$cart['id'];
 
-// Get cart items
+// prendi gli articoli del carrello
     $cartItems = db_run(
     'SELECT ac.*, p.nome as nome_prodotto, p.quantita_giacenza, p.codice_sku
      FROM articoli_carrello ac
@@ -39,7 +39,7 @@ foreach ($cartItems as $item) {
     $total += (float)$item['totale_riga'];
 }
 
-// Get user addresses
+// prende gli indirizzi dell'utente
 $addresses = db_run('SELECT * FROM indirizzi WHERE utente_id = ? ORDER BY creato_il DESC', [$userId])->fetchAll();
 
 $errors = [];
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $addressId = (int)($_POST['address_id'] ?? 0);
     
-    // If "new address" selected, create it
+    // se è selezionato "nuovo indirizzo", crealo
     if (isset($_POST['create_address'])) {
         $fullName = trim($_POST['full_name'] ?? '');
         $line1 = trim($_POST['line1'] ?? '');
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$errors && $addressId > 0) {
-        // Verify address belongs to user
+        // Verifica che l'indirizzo appartenga all'utente
         $address = db_run('SELECT id FROM indirizzi WHERE id = ? AND utente_id = ? LIMIT 1', [$addressId, $userId])->fetch();
         
         if (!$address) {
@@ -87,12 +87,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Seleziona un indirizzo di spedizione o creane uno nuovo.';
     }
 
-    // Process order
+    // Processa l'ordine
     if (!$errors) {
         try {
             db()->beginTransaction();
 
-            // Create order
+            // crea ordine
             db_run(
                 'INSERT INTO ordini (utente_id, stato, importo_totale, valuta, indirizzo_spedizione_id, indirizzo_fatturazione_id, effettuato_il) 
                  VALUES (?, "in_attesa", ?, "EUR", ?, ?, NOW())',
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
             $orderId = (int)db()->lastInsertId();
 
-            // Copy cart items to order items
+            // Copia gli articoli del carrello negli articoli dell'ordine
             foreach ($cartItems as $item) {
                 db_run(
                     'INSERT INTO articoli_ordine (ordine_id, prodotto_id, quantita, prezzo_unitario) 
@@ -108,14 +108,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     [$orderId, (int)$item['prodotto_id'], (int)$item['quantita'], $item['prezzo_unitario']]
                 );
 
-                // Decrease stock
+                // diminuisci la giacenza
                 db_run(
                     'UPDATE prodotti SET quantita_giacenza = quantita_giacenza - ? WHERE id = ?',
                     [(int)$item['quantita'], (int)$item['prodotto_id']]
                 );
             }
 
-            // Clear cart items after order
+            // pulisci carrello
             db_run('DELETE FROM articoli_carrello WHERE carrello_id = ?', [$cartId]);
 
             db()->commit();

@@ -116,7 +116,7 @@ ON DUPLICATE KEY UPDATE quantita=VALUES(quantita);
 -- Svuota carrello dopo l'ordine
 DELETE FROM articoli_carrello WHERE carrello_id=@carrello_id;
 
--- Diminuisci giacenza
+-- Diminuisci giacenza prodotti in base all'ordine
 UPDATE prodotti p
 JOIN articoli_ordine ao ON ao.prodotto_id = p.id AND ao.ordine_id = @ordine_id
 SET p.quantita_giacenza = p.quantita_giacenza - ao.quantita

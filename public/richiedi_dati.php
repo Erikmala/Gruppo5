@@ -17,7 +17,7 @@ $output = fopen("php://output", "w");
 // Aggiungi BOM UTF-8 per corretta visualizzazione caratteri accentati in Excel
 fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-// Intestazioni CSV (italiano)
+// Intestazioni CSV
 fputcsv($output, ['id', 'nome', 'cognome', 'email', 'attivo', 'creato_il', 'aggiornato_il'], ';');
 
 // Recupera dati utente
@@ -28,8 +28,8 @@ $stmt = db_run(
     [$idUtente]
 );
 
-while ($riga = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    // Converti booleano attivo in testo
+while ($riga = $stmt->fetch(PDO::FETCH_ASSOC)) 
+    {
     $riga['attivo'] = $riga['attivo'] ? 'Sì' : 'No';
     fputcsv($output, $riga, ';');
 }

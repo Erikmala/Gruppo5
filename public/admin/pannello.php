@@ -42,7 +42,7 @@ switch ($range) {
   default:    $whereRange = 'AND ta.creato_il >= DATE_SUB(NOW(), INTERVAL 7 DAY)'; $ordersRange = 'AND o.effettuato_il >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
 }
 
-// Statistics
+// statistiche
 $stats = [
   'users'    => (int)db_run('SELECT COUNT(*) as cnt FROM utenti')->fetch()['cnt'],
   'orders'   => (int)db_run('SELECT COUNT(*) as cnt FROM ordini')->fetch()['cnt'],
@@ -50,8 +50,8 @@ $stats = [
   'revenue'  => (float)(db_run('SELECT COALESCE(SUM(importo_totale),0) as totale FROM ordini WHERE stato = "completato"')->fetch()['totale'] ?? 0),
 ];
 
-// Recent failed login attempts
-// Failed attempts (with IP decoded) limited by range
+// tentativi di accesso falliti recenti
+// Tentativi falliti (con IP decodificato) limitati per intervallo
 $failedAttempts = db_run(
   'SELECT email_tentata, INET6_NTOA(indirizzo_ip) AS ip, user_agent, motivo, creato_il 
    FROM tentativi_autenticazione ta
@@ -64,12 +64,12 @@ $failedCount = (int)db_run(
   'SELECT COUNT(*) AS cnt FROM tentativi_autenticazione ta WHERE ta.successo = 0 ' . $whereRange
 )->fetch()['cnt'];
 
-// Locked accounts
+// account bloccati
 $lockedAccounts = db_run(
     'SELECT * FROM v_utenti_bloccati ORDER BY bloccato_fino_a DESC'
 )->fetchAll();
 
-// Recent orders
+// ordini recenti
 $recentOrders = db_run(
   'SELECT o.*, u.email as email_utente 
    FROM ordini o

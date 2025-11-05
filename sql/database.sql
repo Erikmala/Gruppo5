@@ -30,7 +30,7 @@ CREATE TABLE utenti (
 CREATE INDEX idx_utenti_attivo ON utenti (attivo);
 CREATE INDEX idx_utenti_bloccato_fino_a ON utenti (bloccato_fino_a);
 
--- Tabella: utenti_ruoli (molti-a-molti)
+-- Tabella: utenti_ruoli
 CREATE TABLE utenti_ruoli (
   utente_id BIGINT UNSIGNED NOT NULL,
   ruolo_id TINYINT UNSIGNED NOT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE indirizzi (
   citta VARCHAR(120) NOT NULL,
   regione VARCHAR(120) NULL,
   codice_postale VARCHAR(20) NOT NULL,
-  paese CHAR(2) NOT NULL, -- ISO 3166-1 alpha-2
+  paese CHAR(2) NOT NULL,
   telefono VARCHAR(30) NULL,
   creato_il DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   aggiornato_il DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -164,7 +164,6 @@ CREATE TABLE articoli_ordine (
 
 CREATE INDEX idx_articoli_ordine_ordine ON articoli_ordine (ordine_id);
 
--- Helper di sicurezza (viste opzionali)
 -- Una vista che mostra gli utenti con blocco attivo
 CREATE OR REPLACE VIEW v_utenti_bloccati AS
 SELECT id, email, bloccato_fino_a, conteggio_tentativi_falliti
@@ -179,7 +178,6 @@ ON DUPLICATE KEY UPDATE descrizione=VALUES(descrizione);
 
 -- NOTA: Password predefinita per sviluppo: AdminPass123!
 -- Hash generato con: password_hash('AdminPass123!', PASSWORD_DEFAULT)
--- CAMBIARE IN PRODUZIONE!
 INSERT INTO utenti (email, hash_password, nome, cognome, attivo)
 VALUES ('admin@example.com', '$2y$10$Id4OiP/ktMspvNG3VAJyGOjyK5ycvY6g8Zq27eyczpLu3hpurTgA.', 'Admin', 'Sistema', TRUE)
 ON DUPLICATE KEY UPDATE nome=VALUES(nome), cognome=VALUES(cognome);
